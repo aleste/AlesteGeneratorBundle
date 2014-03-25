@@ -1,0 +1,34 @@
+
+    /**
+     * Deletes a {{ entity }} entity.
+     *
+{% if 'annotation' == format %}
+     * @Route("/{id}/delete", name="{{ route_name_prefix }}_delete")
+     * @Method("POST")
+{% endif %}
+     */
+    public function deleteAction({{ entity }} ${{ entity|lower }}, Request $request)
+    {
+        $form = $this->createDeleteForm(${{ entity|lower }}->getId());
+        if ($form->handleRequest($request)->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove(${{ entity|lower }});
+            $em->flush();
+        }
+
+        return $this->redirect($this->generateUrl('{{ route_name_prefix }}'));
+    }
+
+    /**
+     * Create Delete form
+     *
+     * @param integer $id
+     * @return FormBuilder
+     */
+    protected function createDeleteForm($id)
+    {
+        return $this->createFormBuilder(array('id' => $id))
+            ->add('id', 'hidden')
+            ->getForm()
+        ;
+    }

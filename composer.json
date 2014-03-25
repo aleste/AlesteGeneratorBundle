@@ -1,0 +1,25 @@
+{
+    "name": "aleste/generator-bundle",
+    "type": "symfony-bundle",
+    "description": "Extension of SensioGeneratorBundle",
+    "keywords": ["symfony2 form field"],
+    "license": "LGPL-3.0+",
+    "authors": [
+        {
+            "name": "Alejandro Steinmetz",
+            "email": "asteinmetz78@gmail.com",
+            "homepage": "http://proyectodev.com.ar"
+        }        
+    ],
+    "require": {
+        "sensio/generator-bundle": "~2.3"
+    },
+    "suggest": {
+        "knplabs/knp-paginator-bundle": "Needed for optional pagination",
+        "lexik/form-filter-bundle": "Needed for optional filters"
+    },
+    "autoload": {
+        "psr-0": { "Aleste\\GeneratorBundle": "" }
+    },
+    "target-dir": "Aleste/GeneratorBundle"
+}

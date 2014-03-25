@@ -7,9 +7,13 @@
 {{ '{% block title %}' ~ "{{ '%entity% creation'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" ~ '{% endblock %}' }}
 
 {{ '{% block ' ~ bodyBlock ~ ' %}' }}
-    <h1>{{ "{{ '%entity% creation'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h1>
 
-    <form action="{{ "{{ path('"~ route_name_prefix ~"_create') }}" }}" method="post" {{ "{{ form_enctype(form) }}" }}>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{ "{{ '%entity% creation'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
+  </div>
+  <div class="panel-body">
+    <form action="{{ "{{ path('"~ route_name_prefix ~"_create') }}" }}" method="post" {{ "{{ form_enctype(form) }}" role="form"}}>
         {{ "{{ form_widget(form) }}" }}
         <p>
             <button class="btn btn-primary" type="submit">{{ "{{ 'Create'|trans({}, 'admin') }}" }}</button>
@@ -18,5 +22,7 @@
 
     {% set hide_edit, hide_delete = true, true %}
     {% include 'crud/views/others/record_actions.html.twig.twig' %}
+  </div>
+</div>
 
 {{ '{% endblock %}' }}

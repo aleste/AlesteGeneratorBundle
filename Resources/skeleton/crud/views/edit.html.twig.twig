@@ -1,6 +1,7 @@
 {{ '{% extends "' ~ layout ~ '" %}' }}
-{% if theme %}
-
+{% if theme == '' %}
+{{ "{% form_theme edit_form 'AlesteGeneratorBundle:widget:fields.html.twig' %}" }}
+{% else %}
 {{ "{% form_theme edit_form '"~ theme ~"' %}" }}
 {% endif %}
 
@@ -12,8 +13,7 @@
   <div class="panel-heading">
     <h3 class="panel-title">{{ "{{ '%entity% edit'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
   </div>
-  <div class="panel-body">
-   {{ "{% form_theme edit_form 'AlesteGeneratorBundle:widget:fields.html.twig' %}" }}
+  <div class="panel-body">   
         <form action="{{ "{{ path('"~ route_name_prefix ~"_update', {id: "~ entity|lower ~".id}) }}" }}" method="post" {{ "{{ form_enctype(edit_form) }}" }}>
         {{ "{{ form_widget(edit_form) }}" }}
         <p>

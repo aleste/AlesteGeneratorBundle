@@ -13,6 +13,7 @@
     <h3 class="panel-title">{{ "{{ '%entity% edit'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
   </div>
   <div class="panel-body">
+   {{ "{% form_theme edit_form 'AlesteGeneratorBundle:widget:fields.html.twig' %}" }}
         <form action="{{ "{{ path('"~ route_name_prefix ~"_update', {id: "~ entity|lower ~".id}) }}" }}" method="post" {{ "{{ form_enctype(edit_form) }}" }}>
         {{ "{{ form_widget(edit_form) }}" }}
         <p>

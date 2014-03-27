@@ -1,6 +1,6 @@
 
 {% if theme == '' -%}
-{{ "{% form_theme edit_form 'AlesteGeneratorBundle:widget:fields.html.twig' %}" }}
+{{ "{% form_theme form 'AlesteGeneratorBundle:widget:fields.html.twig' %}" }}
 {% else %}
 {{ "{% form_theme form '"~ theme ~"' %}" }}
 {% endif %}

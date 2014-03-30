@@ -17,7 +17,7 @@
     <form action="{{ "{{ path('"~ route_name_prefix ~"_create') }}" }}" method="post" {{ "{{ form_enctype(form) }}" }}>
         {{ "{{ form_widget(form) }}" }}
         <p>
-            <button class="btn btn-primary" type="submit">{{ "{{ 'Create'|trans({}, 'admin') }}" }}</button>
+            <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> {{ "{{ 'Save'|trans({}, 'admin') }}" }}</button>
         </p>
     </form>
 

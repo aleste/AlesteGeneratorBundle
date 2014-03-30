@@ -2,7 +2,7 @@
     "name": "aleste/generator-bundle",
     "type": "symfony-bundle",
     "description": "Extension of SensioGeneratorBundle",
-    "keywords": ["symfony2 form field"],
+    "keywords": ["symfony2 crud generator filter paginator twitter bootstrap"],
     "license": "LGPL-3.0+",
     "authors": [
         {

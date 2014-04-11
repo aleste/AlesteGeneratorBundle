@@ -33,7 +33,7 @@ class GenerateDoctrineCrudCommand extends BaseCommand
         $this
             ->setDefinition(array(
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The entity class name to initialize (shortcut notation)'),
-                new InputOption('layout', '', InputOption::VALUE_REQUIRED, 'The layout to use for templates', 'TwigBundle::layout.html.twig'),
+                new InputOption('layout', '', InputOption::VALUE_REQUIRED, 'The layout to use for templates', 'GestionBundle::layout.html.twig'),
                 new InputOption('body-block', '', InputOption::VALUE_REQUIRED, 'The name of "body" block in your layout. Default is "content"', 'content'),
                 new InputOption('route-prefix', '', InputOption::VALUE_REQUIRED, 'The route prefix'),
                 new InputOption('with-write', '', InputOption::VALUE_NONE, 'Whether or not to generate create, new and delete actions'),

@@ -18,11 +18,11 @@
             } catch (\Exception $e) {            
                 if($e->getPrevious()->getCode() == 23000){
                     $this->get('session')->getFlashBag()->add('danger', 'flash.delete.error-relations');
-                    return $this->redirect($this->generateUrl('gestion_pais'));
+                    return $this->redirect($this->generateUrl('{{ route_name_prefix }}'));
                 }else{
                     throw new \Exception($e);                
                 }                
-                return $this->redirect($this->generateUrl('gestion_pais'));
+                return $this->redirect($this->generateUrl('{{ route_name_prefix }}'));
             }            
             $this->get('session')->getFlashBag()->add('success', 'flash.delete.success');
         }else{

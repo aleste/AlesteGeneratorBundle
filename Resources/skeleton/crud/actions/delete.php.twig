@@ -12,8 +12,18 @@
         $form = $this->createDeleteForm(${{ entity|lower }}->getId());
         if ($form->handleRequest($request)->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->remove(${{ entity|lower }});
-            $em->flush();
+            try{
+                $em->remove(${{ entity|lower }});
+                $em->flush();
+            } catch (\Exception $e) {            
+                if($e->getPrevious()->getCode() == 23000){
+                    $this->get('session')->getFlashBag()->add('danger', 'flash.delete.error-relations');
+                    return $this->redirect($this->generateUrl('gestion_pais'));
+                }else{
+                    throw new \Exception($e);                
+                }                
+                return $this->redirect($this->generateUrl('gestion_pais'));
+            }            
             $this->get('session')->getFlashBag()->add('success', 'flash.delete.success');
         }else{
             $this->get('session')->getFlashBag()->add('danger', 'flash.delete.error');

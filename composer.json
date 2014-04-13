@@ -1,8 +1,8 @@
 {
     "name": "aleste/generator-bundle",
     "type": "symfony-bundle",
-    "description": "Extension of SensioGeneratorBundle",
-    "keywords": ["symfony2 crud generator filter paginator twitter bootstrap"],
+    "description": "Extension of SensioGeneratorBundle with paginator, filters, and more...",
+    "keywords": ["symfony2 crud generator filter paginator wbtwitter bootstrap"],
     "license": "LGPL-3.0+",
     "authors": [
         {

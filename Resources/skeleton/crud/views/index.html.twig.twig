@@ -24,7 +24,10 @@
 {% endif -%}
 
 {{ '{% block ' ~ bodyBlock ~ ' %}' }}
-    <h3>{{ "{{ '%entity% list'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
+
+<div class="page-header">
+    <h5>{{ "{{ '%entity% list'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h5>
+</div>
 
     {% if withFilter -%}
         <div class="row">

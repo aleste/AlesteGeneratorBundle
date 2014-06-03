@@ -17,19 +17,19 @@ class {{ form_class }} extends AbstractType
         {% for field, metadata in fields -%}
         {%- if metadata.type == 'relation' or metadata.type == 'relation_many' %}
 
-            ->add('{{ field }}', 'filter_entity', array('class' => '{{ metadata.entity }}'))
+            ->add('{{ field }}', 'filter_entity', array('label' => '{{ field|capitalize }}', 'class' => '{{ metadata.entity }}', array('attr' => array('class' => 'form-control'))))
         {%- elseif metadata.type == 'boolean' %}
 
-            ->add('{{ field }}', 'filter_boolean')
+            ->add('{{ field }}', 'filter_boolean', array('label' => '{{ field|capitalize }}', 'attr' => array('class' => 'form-control')))
         {%- elseif metadata.type == 'integer' and field != 'id' %}
 
             ->add('{{ field }}', 'filter_number')
         {%- elseif metadata.type == 'date' or metadata.type == 'datetime' %}
 
-            ->add('{{ field }}', 'filter_date')
+            ->add('{{ field }}', 'filter_date', array('label' => '{{ field|capitalize }}'))
         {%- elseif field != 'id' %}
 
-            ->add('{{ field }}', 'filter_text')
+            ->add('{{ field }}', 'filter_text', array('label' => '{{ field|capitalize }}'))
         {%- endif %}
         {%- endfor %}
 

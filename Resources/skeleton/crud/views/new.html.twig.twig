@@ -9,7 +9,7 @@
 
 {{ '{% block ' ~ bodyBlock ~ ' %}' }}
 
-<div class="well bs-component col-lg-6">
+<div class="well well-sm bs-component col-lg-6">
 <legend>{{ "{{ '%entity% creation'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</legend>
 
     <form action="{{ "{{ path('"~ route_name_prefix ~"_create') }}" }}" method="post" {{ "{{ form_enctype(form) }}" }}>

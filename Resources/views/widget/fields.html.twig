@@ -27,14 +27,14 @@
 {% spaceless %}
     <div class="form-group">
         {% set type = type|default('text') %}
-        <input class="form-control" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </div>
 {% endspaceless %}
 {% endblock form_widget_simple %}
 
 {% block textarea_widget %}
 {% spaceless %}    
-        <textarea class="form-control" {{ block('widget_attributes') }}>{{ value }}</textarea>
+        <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 {% endspaceless %}
 {% endblock textarea_widget %}
 

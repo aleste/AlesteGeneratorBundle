@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Generates a CRUD for a Doctrine entity.
@@ -78,7 +79,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dialog = $this->getDialogHelper();
+        /*$dialog = $this->getDialogHelper();
 
         if ($input->isInteractive()) {
             if (!$dialog->askConfirmation($output, $dialog->getQuestion('Do you confirm generation', 'yes', '?'), true)) {
@@ -86,7 +87,16 @@ EOT
 
                 return 1;
             }
+        }*/
+
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion('Do you confirm generation?', false);
+        if (!$helper->ask($input, $output, $question)) {
+            $output->writeln('<error>Command aborted</error>');
+            return 1;
         }
+
+        $dialog = $this->getDialogHelper();
 
         $entity = Validators::validateEntityName($input->getOption('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);

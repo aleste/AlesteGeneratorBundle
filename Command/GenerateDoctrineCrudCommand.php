@@ -334,10 +334,6 @@ EOT
         return $prefix;
     }
 
-    protected function createGenerator($bundle = null)
-    {
-        return new DoctrineCrudGenerator($this->getContainer()->get('filesystem'));
-    }
 
     protected function getFormGenerator($bundle = null)
     {

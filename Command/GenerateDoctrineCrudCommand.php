@@ -27,6 +27,8 @@ class GenerateDoctrineCrudCommand extends BaseCommand
 {
     protected $generator;
     protected $formGenerator;
+    protected $filterGenerator;
+    
 
     protected function configure()
     {
@@ -110,8 +112,24 @@ EOT
         $metadata    = $this->getEntityMetadata($entityClass);
         $bundle      = $this->getContainer()->get('kernel')->getBundle($bundle);
 
+
+        // paginator?
+        $usePaginator = $input->getOption('use-paginator') ?: false;
+        $output->writeln(array(
+            '',
+            'By default, the generator creates an index action with list of all entites.',
+            'You can also ask it to generate a paginator. Please notice that <comment>KnpPaginatorBundle</comment> is required.',
+            '',
+        ));
+        
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want a paginator', $usePaginator ? 'yes' : 'no', '?', $usePaginator), $usePaginator);
+
+        $usePaginator = $questionHelper->ask($input, $output, $question);        
+        $input->setOption('use-paginator', $usePaginator);
+
+
         $generator = $this->getGenerator($bundle);        
-        $generator->generate($bundle, $bundle, $entity, $metadata[0], $format, $prefix, $withWrite = true, $forceOverwrite = true, $layout = 'TwigBundle::layout.html.twig', $bodyBlock = 'body', $usePaginator = true, $theme = '', $withFilter = true, $withSort = true);
+        $generator->generate($bundle, $bundle, $entity, $metadata[0], $format, $prefix, $withWrite = true, $forceOverwrite = true, $layout = 'GestionBundle::layout.html.twig', $bodyBlock = 'body', $usePaginator, $theme = '', $withFilter = true, $withSort = true);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
@@ -128,6 +146,16 @@ EOT
                 $output->writeln('<warning>Already exists, skipping</warning>');
             }
         }
+
+        // form
+        if ($withFilter) {
+            $output->write('Generating the Filter code: ');
+            if ($this->generateFilter($bundle, $entity, $metadata)) {
+                $output->writeln('<info>OK</info>');
+            } else {
+                $output->writeln('<warning>Already exists, skipping</warning>');
+            }
+        }        
 
         // routing
         if ('annotation' != $format) {
@@ -151,8 +179,22 @@ EOT
         return true;
     }
 
+    /**
+     * Tries to generate forms if they don't exist yet and if we need write operations on entities.
+     */
+    protected function generateFilter($bundle, $entity, $metadata)
+    {
+        try {
+            $this->getFilterGenerator($bundle)->generate($bundle, $bundle, $entity, $metadata[0]);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
 
-        protected function getFormGenerator($bundle = null)
+        return true;
+    }    
+
+
+    protected function getFormGenerator($bundle = null)
     {
         if (null === $this->formGenerator) {
             $this->formGenerator = new DoctrineFormGenerator($this->getContainer()->get('filesystem'));
@@ -161,6 +203,16 @@ EOT
 
         return $this->formGenerator;
     }
+
+    protected function getFilterGenerator($bundle = null)
+    {
+        if (null === $this->filterGenerator) {
+            $this->filterGenerator = new DoctrineFormGenerator($this->getContainer()->get('filesystem'));
+            $this->filterGenerator->setSkeletonDirs($this->getSkeletonDirs($bundle));
+        }
+
+        return $this->filterGenerator;
+    }    
 
     /**
      * add this bundle skeleton dirs to the beginning of the parent skeletonDirs array
@@ -194,6 +246,7 @@ EOT
         $questionHelper = $this->getQuestionHelper();
         $questionHelper->writeSection($output, 'Welcome to the Aleste Bootstrap 3 CRUD generator');
 
-        parent::interact($input, $output);
+        parent::interact($input, $output);       
+
     }
 }

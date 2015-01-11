@@ -29,7 +29,7 @@ class {{ form_class }} extends AbstractType
             ->add('{{ field }}', 'filter_date', array('label' => '{{ field|capitalize }}'))
         {%- elseif field != 'id' %}
 
-            ->add('{{ field }}', 'filter_text', array('label' => '{{ field|capitalize }}'))
+            ->add('{{ field }}', 'filter_text', array('label' => '{{ field|capitalize }}', 'attr' => array('class' => 'form-control')))
         {%- endif %}
         {%- endfor %}
 

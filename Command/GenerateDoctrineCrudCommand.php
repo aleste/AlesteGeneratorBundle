@@ -2,6 +2,8 @@
 
 namespace Aleste\GeneratorBundle\Command;
 
+use Aleste\GeneratorBundle\Generator\DoctrineCrudGenerator;
+use Aleste\GeneratorBundle\Generator\DoctrineFormGenerator;
 use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineCrudCommand as BaseCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;

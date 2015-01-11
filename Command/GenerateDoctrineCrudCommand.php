@@ -23,11 +23,10 @@ use Sensio\Bundle\GeneratorBundle\Command\Validators;
  * 
  * @author Alejandro Steinmetz <asteinmetz78@gmail.com> 
  */
-class AlesteGeneratorCrudCommand extends BaseCommand
+class GenerateDoctrineCrudCommand extends BaseCommand
 {
     private $formGenerator;
     private $filterGenerator;
-    private $generator;
 
     /**
      * @see Command
@@ -122,11 +121,11 @@ EOT
         $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
         $metadata    = $this->getEntityMetadata($entityClass);
         $bundle      = $this->getContainer()->get('kernel')->getBundle($bundle);
+        $destBundle  = $this->getContainer()->get('kernel')->getBundle($bundle);
 
-        $generator = $this->getGenerator($bundle);        
-        var_dump($generator);
-        // $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
-        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite, $layout, $bodyBlock, $usePaginator, $withFilter, $withSort);
+        $generator = $this->getGenerator($bundle);
+        $generator->generate($bundle, $destBundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
+       // $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite, $layout, $bodyBlock, $usePaginator, $withFilter, $withSort);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
@@ -335,6 +334,10 @@ EOT
         return $prefix;
     }
 
+    protected function createGenerator($bundle = null)
+    {
+        return new DoctrineCrudGenerator($this->getContainer()->get('filesystem'));
+    }
 
     protected function getFormGenerator($bundle = null)
     {
@@ -361,12 +364,6 @@ EOT
     {
         $this->filterGenerator = $filterGenerator;
     }  
-
-
-    protected function createGenerator($bundle = null)
-    {
-        return new DoctrineCrudGenerator($this->getContainer()->get('filesystem'));
-    }    
 
     /**
      * add this bundle skeleton dirs to the beginning of the parent skeletonDirs array

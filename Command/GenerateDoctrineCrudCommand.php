@@ -25,6 +25,7 @@ use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
 class GenerateDoctrineCrudCommand extends BaseCommand
 {
     private $formGenerator;
+    private $filterGenerator;
 
     /**
      * @see Command
@@ -263,7 +264,7 @@ EOT
     /**
      * Tries to generate filter forms if they don't exist yet and if we need write operations on entities.
      */
-    protected function generateFiter($bundle, $entity, $metadata)
+    protected function generateFilter($bundle, $entity, $metadata)
     {
         try {
             $this->getFilterGenerator($bundle)->generate($bundle, $entity, $metadata[0]);
@@ -342,10 +343,6 @@ EOT
         return $this->filterGenerator;
     }    
 
-    public function setFormGenerator(DoctrineFormGenerator $formGenerator)
-    {
-        $this->formGenerator = $formGenerator;
-    }
 
     public function setFilterGenerator(DoctrineFormGenerator $filterGenerator)
     {

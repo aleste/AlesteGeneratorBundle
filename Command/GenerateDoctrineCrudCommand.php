@@ -53,8 +53,8 @@ class GenerateDoctrineCrudCommand extends BaseCommand
             $skeletonDirs[] = $dir;
         }
 
-        $skeletonDirs[] = $this->getContainer()->get('kernel')->locateResource('@AlesteCrudGeneratorBundle/Resources/skeleton');
-        $skeletonDirs[] = $this->getContainer()->get('kernel')->locateResource('@AlesteCrudGeneratorBundle/Resources');
+        $skeletonDirs[] = $this->getContainer()->get('kernel')->locateResource('@AlesteGeneratorBundle/Resources/skeleton');
+        $skeletonDirs[] = $this->getContainer()->get('kernel')->locateResource('@AlesteGeneratorBundle/Resources');
 
         return $skeletonDirs;
     }

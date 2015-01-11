@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  * @author Fabien Potencier <fabien@symfony.com> 
  * @author Alejandro Steinmetz <asteinmetz78@gmail.com>
  */
-class DoctrineCrudGenerator extends Generator
+class AlesteCrudGenerator extends Generator
 {
     protected $filesystem;
     protected $routePrefix;
@@ -45,8 +45,7 @@ class DoctrineCrudGenerator extends Generator
     /**
      * Generate the CRUD controller.
      *
-     * @param BundleInterface   $bundle             A bundle object
-     * @param BundleInterface   $destBundle         The destination bundle object
+     * @param BundleInterface   $bundle             A bundle object    
      * @param string            $entity             The entity relative class name
      * @param ClassMetadataInfo $metadata           The entity class metadata
      * @param string            $format             The configuration format (xml, yaml, annotation)
@@ -62,7 +61,7 @@ class DoctrineCrudGenerator extends Generator
      *
      * @throws \RuntimeException
      */
-    public function generate(BundleInterface $bundle, BundleInterface $destBundle, $entity, ClassMetadataInfo $metadata, $format, $routePrefix, $needWriteActions, $forceOverwrite, $layout, $bodyBlock, $usePaginator = false, $theme = null, $withFilter = false, $withSort = false)
+    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata, $format, $routePrefix, $needWriteActions, $forceOverwrite, $layout, $bodyBlock, $usePaginator = false, $theme = null, $withFilter = false, $withSort = false)
     {
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = str_replace('/', '_', $routePrefix);
@@ -72,10 +71,12 @@ class DoctrineCrudGenerator extends Generator
             $this->actions[] = 'sort';
         }
 
-        if ($withFilter) {
+        $this->actions[] = 'filter';
+        $this->filterTemplate = '';
+        /*if ($withFilter) {
             $this->actions[] = 'filter';
             $this->filterTemplate = '';
-        }
+        }*/
 
         if (count($metadata->identifier) > 1) {
             throw new \RuntimeException('The CRUD generator does not support entity classes with multiple primary keys.');

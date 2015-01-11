@@ -30,10 +30,48 @@ class GenerateDoctrineCrudCommand extends BaseCommand
 
     protected function configure()
     {
-        parent::configure();
+        $this
+            ->setDefinition(array(
+                new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The entity class name to initialize (shortcut notation)'),
+                new InputOption('layout', '', InputOption::VALUE_REQUIRED, 'The layout to use for templates', 'GestionBundle::layout.html.twig'),
+                new InputOption('body-block', '', InputOption::VALUE_REQUIRED, 'The name of "body" block in your layout. Default is "content"', 'content'),
+                new InputOption('route-prefix', '', InputOption::VALUE_REQUIRED, 'The route prefix'),
+                new InputOption('with-write', '', InputOption::VALUE_NONE, 'Whether or not to generate create, new and delete actions'),
+                new InputOption('overwrite', '', InputOption::VALUE_NONE, 'Do not stop the generation if crud controller already exist, thus overwriting all generated files'),
+                new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, yml, or annotation)', 'annotation'),
+                new InputOption('use-paginator', '', InputOption::VALUE_NONE,'Whether or not to use paginator'),
+                new InputOption('theme', '', InputOption::VALUE_OPTIONAL, 'A possible theme to use in forms'),
+                new InputOption('dest', '', InputOption::VALUE_OPTIONAL, 'Change the default destination of the generated code', null),
+                new InputOption('with-filter', '', InputOption::VALUE_NONE, 'Whether or not to add filter'),
+                new InputOption('with-sort', '', InputOption::VALUE_NONE, 'Whether or not to add sorting'),
+            ))
+            ->setDescription('Generates a CRUD based on a Doctrine entity')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command generates a CRUD based on a Doctrine entity.
 
-        $this->setName('aleste:generate:crud');
-        $this->setDescription('A CRUD generator with paginating and filters.');
+The default command only generates the <comment>list</comment> and <comment>show</comment> actions.
+
+<info>php app/console aleste:generate:crud --entity=AcmeBlogBundle:Post --route-prefix=post_admin</info>
+
+Using the --with-write option allows to generate the <comment>new</comment>, <comment>edit</comment> and <comment>delete</comment> actions.
+
+<info>php app/console aleste:generate:crud --entity=AcmeBlogBundle:Post --route-prefix=post_admin --with-write</info>
+
+Using the --use-paginator option allows to generate <comment>list</comment> action with paginator.
+
+Using the --with-filter option allows to generate <comment>list</comment> action with filter.
+
+Using the --with-sort option allows to generate <comment>list</comment> action with sorting.
+
+Using the --dest option allows to generate CRUD in a different bundle:
+
+<info>php %command.full_name% --entity=AcmeBlogBundle:Post --dest=AnotherBundle</info>
+EOT
+            )
+            ->setName('aleste:generate:crud')
+            ->setAliases(array('generate:aleste:crud'))
+        ;
+    }
     }
 
     protected function createGenerator($bundle = null)
@@ -80,6 +118,7 @@ class GenerateDoctrineCrudCommand extends BaseCommand
         $errors = array();
         $runner = $questionHelper->getRunner($output, $errors);
 
+
         // form
         if ($withWrite) {
             $output->write('Generating the Form code: ');
@@ -98,22 +137,56 @@ class GenerateDoctrineCrudCommand extends BaseCommand
         $questionHelper->writeGeneratorSummary($output, $errors);
     }
 
+    /**
+     * Tries to generate forms if they don't exist yet and if we need write operations on entities.
+     */
+    protected function generateForm($bundle, $entity, $metadata)
+    {
+        try {
+            $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0]);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return true;
+    }
+        
+
+        protected function getFormGenerator($bundle = null)
+    {
+        if (null === $this->formGenerator) {
+            $this->formGenerator = new DoctrineFormGenerator($this->getContainer()->get('filesystem'));
+            $this->formGenerator->setSkeletonDirs($this->getSkeletonDirs($bundle));
+        }
+
+        return $this->formGenerator;
+    }
+
+    /**
+     * add this bundle skeleton dirs to the beginning of the parent skeletonDirs array
+     *
+     * @param BundleInterface $bundle
+     *
+     * @return array
+     */
     protected function getSkeletonDirs(BundleInterface $bundle = null)
     {
+        $baseSkeletonDirs = parent::getSkeletonDirs($bundle);
+
         $skeletonDirs = array();
 
-        if (isset($bundle) && is_dir($dir = $bundle->getPath().'/Resources/SensioGeneratorBundle/skeleton')) {
+        if (isset($bundle) && is_dir($dir = $bundle->getPath().'/Resources/AlesteGeneratorBundle/skeleton')) {
             $skeletonDirs[] = $dir;
         }
 
-        if (is_dir($dir = $this->getContainer()->get('kernel')->getRootdir().'/Resources/SensioGeneratorBundle/skeleton')) {
+        if (is_dir($dir = $this->getContainer()->get('kernel')->getRootdir().'/Resources/AlesteGeneratorBundle/skeleton')) {
             $skeletonDirs[] = $dir;
         }
 
-        $skeletonDirs[] = $this->getContainer()->get('kernel')->locateResource('@AlesteGeneratorBundle/Resources/skeleton');
-        $skeletonDirs[] = $this->getContainer()->get('kernel')->locateResource('@AlesteGeneratorBundle/Resources');
+        $skeletonDirs[] = __DIR__.'/../Resources/skeleton';
+        $skeletonDirs[] = __DIR__.'/../Resources';
 
-        return $skeletonDirs;
+        return array_merge($skeletonDirs, $baseSkeletonDirs);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

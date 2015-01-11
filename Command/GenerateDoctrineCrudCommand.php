@@ -201,6 +201,20 @@ EOT
         $withWrite = $questionHelper->ask($input, $output, $question);
         $input->setOption('with-write', $withWrite);
 
+        //paginator?
+        $usePaginator = $input->getOption('use-paginator') ?: false;
+        $output->writeln(array(
+            '',
+            'By default, the generator dont use paginator to list results',
+            'You can also ask it to generate "paginator" for the result list',
+            '',
+        ));
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want to use "paginator"', $usePaginator ? 'yes' : 'no', '?', $usePaginator), $usePaginator);
+
+        $usePaginator = $questionHelper->ask($input, $output, $question);
+        $input->setOption('use-paginator', $usePaginator);        
+
+
         // filter?
         $withFilter = $input->getOption('with-filter') ?: false;
         $output->writeln(array(

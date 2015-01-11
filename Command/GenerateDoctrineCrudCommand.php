@@ -72,8 +72,8 @@ class GenerateDoctrineCrudCommand extends BaseCommand
         $metadata    = $this->getEntityMetadata($entityClass);
         $bundle      = $this->getContainer()->get('kernel')->getBundle($bundle);
 
-        $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
+        $generator = $this->getGenerator($bundle);        
+        $generator->generate($bundle, $bundle, $entity, $metadata[0], $format, $prefix, $withWrite = true, $forceOverwrite = true, $layout = 'TwigBundle::layout.html.twig', $bodyBlock = 'body', $usePaginator = true, $theme = '', $withFilter = true, $withSort = true);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 

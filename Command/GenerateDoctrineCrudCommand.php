@@ -2,19 +2,22 @@
 
 namespace Aleste\GeneratorBundle\Command;
 
-use Aleste\GeneratorBundle\Generator\DoctrineCrudGenerator;
-use Aleste\GeneratorBundle\Generator\DoctrineFormGenerator;
+
 use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineCrudCommand as BaseCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
+use Sensio\Bundle\GeneratorBundle\Generator\DoctrineCrudGenerator;
+use Sensio\Bundle\GeneratorBundle\Generator\DoctrineFormGenerator;
 use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
+
 
 /**
  * Generates a CRUD for a Doctrine entity.
@@ -100,21 +103,22 @@ EOT
 
         $format = Validators::validateFormat($input->getOption('format'));
         $prefix = $this->getRoutePrefix($input, $entity);
-        $withWrite = $input->getOption('with-write');
+
+        $withWrite      = $input->getOption('with-write');
         $forceOverwrite = $input->getOption('overwrite');
-        $layout = $input->getOption('layout');  // TODO validate
-        $bodyBlock = $input->getOption('body-block');  // TODO validate
-        $usePaginator = $input->getOption('use-paginator');
-        $theme = $input->getOption('theme');  // TODO validate
-        $withFilter = $input->getOption('with-filter');  // TODO validate
-        $withSort = $input->getOption('with-sort');  // TODO validate
-        $dest = $input->getOption('dest')?:$bundle;  // TODO validate
+        $layout         = $input->getOption('layout');  // TODO validate
+        $bodyBlock      = $input->getOption('body-block');  // TODO validate
+        $usePaginator   = $input->getOption('use-paginator');
+        $theme          = $input->getOption('theme');  // TODO validate
+        $withFilter     = $input->getOption('with-filter');  // TODO validate
+        $withSort       = $input->getOption('with-sort');  // TODO validate
+        $dest           = $input->getOption('dest')?:$bundle;  // TODO validate
 
         if ($withFilter && !$usePaginator) {
             throw new \RuntimeException(sprintf('Cannot use filter without paginator.'));
         }
 
-        $questionHelper->writeSection($output, 'CRUD generation');        
+        $questionHelper->writeSection($output, 'CRUD generation');   
 
         $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
         $metadata    = $this->getEntityMetadata($entityClass);
@@ -123,8 +127,8 @@ EOT
 
         $generator = $this->getGenerator($bundle);
         $generator->generate($bundle, $destBundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite, $layout, $bodyBlock, $usePaginator, $theme, $withFilter, $withSort);
-
         $output->writeln('Generating the CRUD code: <info>OK</info>');
+
 
         $errors = array();
         $runner = $questionHelper->getRunner($output, $errors);
@@ -146,6 +150,7 @@ EOT
             $runner($this->updateRouting($questionHelper, $input, $output, $bundle, $format, $entity, $prefix));
         }
 
+        
         $questionHelper->writeGeneratorSummary($output, $errors);
     }
 
@@ -216,7 +221,7 @@ EOT
 
     /**
      * Override "interact" method to ask for adding parameters
-     */
+     */    
     protected function interact(InputInterface $input, OutputInterface $output)
     {
 

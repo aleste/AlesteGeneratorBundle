@@ -72,9 +72,9 @@ EOT
             ->setAliases(array('generate:aleste:crud'))
         ;
     }
-    }
+    
 
-    private function createGenerator($bundle = null)
+    protected function createGenerator($bundle = null)
     {
         return new DoctrineCrudGenerator($this->getContainer()->get('filesystem'));
     }

@@ -16,8 +16,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
 
-
-
 /**
  * Generates a CRUD for a Doctrine entity.
  *

@@ -24,15 +24,29 @@
 {% endif -%}
 
 {{ '{% block ' ~ bodyBlock ~ ' %}' }}
-    <h3>{{ "{{ '%entity% list'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
 
-    {% if withFilter -%}
-        <div class="row">
-            <div class="col-lg-6">
-                {{ "{% include '"~ dest_bundle ~":"~ entity ~":filter.html.twig' with {form: form} %}" }}
-            </div>      
-        </div>
-    {% endif %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{ "{{ '%entity% list'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
+  </div>
+  <div class="panel-body">
+
+<div class="row">
+  <div class="col-md-11">
+      {{ "{% include '"~ dest_bundle ~":"~ entity ~":filter.html.twig' with {form: form} %}" }}
+  </div>
+    <div class="col-md-1">
+        <p class="text-right">
+         {% if 'new' in actions %}
+            <a class="btn btn-info" href="{{ "{{ path('"~ route_name_prefix ~"_new') }}" }}">
+                <i class="fa fa-plus"></i> {{ "{{ 'Create a new entry'|trans({}, 'admin') }}" }}
+            </a>   
+        {% endif %}
+        </p>
+  </div>
+</div> 
+
 
     <table class="table table-striped table-hover table-bordered table-condensed records_list">
         <thead>

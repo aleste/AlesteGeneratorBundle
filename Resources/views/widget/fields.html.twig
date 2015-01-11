@@ -1,17 +1,40 @@
+{% form_theme form _self %}
+
+{% block widget_attributes %}
+{% spaceless %}
+    id="{{ id }}" name="{{ full_name }}"
+    {%- if read_only %} readonly="readonly"{% endif -%}
+    {%- if disabled %} disabled="disabled"{% endif -%}
+    {%- if required %} required="required"{% endif -%}
+    {%- if max_length %} maxlength="{{ max_length }}"{% endif -%}
+    {%- if pattern %} pattern="{{ pattern }}"{% endif -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+        {%- elseif attrname in ['class'] -%}
+            {{- attrname }}="form-control {{ attrvalue|trans({}, translation_domain) }}"            
+        {%- elseif attrvalue is sameas(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not sameas(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{% endspaceless %}
+{% endblock widget_attributes %}
+
 {% block form_widget_simple %}
 {% spaceless %}
     <div class="form-group">
         {% set type = type|default('text') %}
-        <input class="form-control" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </div>
 {% endspaceless %}
 {% endblock form_widget_simple %}
 
 {% block textarea_widget %}
-{% spaceless %}
-    <div class="input-group input-group-lg">
-        <textarea class="form-control" {{ block('widget_attributes') }}>{{ value }}</textarea>
-    </div>
+{% spaceless %}    
+        <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 {% endspaceless %}
 {% endblock textarea_widget %}
 

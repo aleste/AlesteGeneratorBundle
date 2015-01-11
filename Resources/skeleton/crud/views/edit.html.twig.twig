@@ -9,12 +9,9 @@
 
 {{ '{% block ' ~ bodyBlock ~ ' %}' }}
 
-<div class="panel panel-default col-md-6">
-  <div class="panel-heading">
-    <h3 class="panel-title">{{ "{{ '%entity% edit'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</h3>
-  </div>
-  <div class="panel-body">   
-        <form action="{{ "{{ path('"~ route_name_prefix ~"_update', {id: "~ entity|lower ~".id}) }}" }}" method="post" {{ "{{ form_enctype(edit_form) }}" }}>
+<div class="well well-sm bs-component col-lg-6">
+  <legend>{{ "{{ '%entity% edit'|trans({'%entity%': '"~ entity ~"'}, 'admin') }}" }}</legend>
+    <form action="{{ "{{ path('"~ route_name_prefix ~"_update', {id: "~ entity|lower ~".id}) }}" }}" method="post" {{ "{{ form_enctype(edit_form) }}" }}>
         {{ "{{ form_widget(edit_form) }}" }}
         <p>
             <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> {{ "{{ 'Save'|trans({}, 'admin') }}" }}</button>
@@ -24,6 +21,5 @@
     {% set hide_edit, hide_delete = true, false %}
     {% include 'crud/views/others/record_actions.html.twig.twig' %}
   </div>
-</div>
 
 {{ '{% endblock %}' }}

@@ -43,8 +43,7 @@ class GenerateDoctrineCrudCommand extends BaseCommand
                 new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, yml, or annotation)', 'annotation'),
                 new InputOption('use-paginator', '', InputOption::VALUE_NONE,'Whether or not to use paginator'),
                 new InputOption('theme', '', InputOption::VALUE_OPTIONAL, 'A possible theme to use in forms'),
-                new InputOption('dest', '', InputOption::VALUE_OPTIONAL, 'Change the default destination of the generated code', null),
-                new InputOption('with-filter', '', InputOption::VALUE_NONE, 'Whether or not to add filter'),
+                new InputOption('dest', '', InputOption::VALUE_OPTIONAL, 'Change the default destination of the generated code', null),                
                 new InputOption('with-sort', '', InputOption::VALUE_NONE, 'Whether or not to add sorting'),
             ))
             ->setDescription('Generates a CRUD based on a Doctrine entity')
@@ -61,7 +60,7 @@ Using the --with-write option allows to generate the <comment>new</comment>, <co
 
 Using the --use-paginator option allows to generate <comment>list</comment> action with paginator.
 
-Using the --with-filter option allows to generate <comment>list</comment> action with filter.
+
 
 Using the --with-sort option allows to generate <comment>list</comment> action with sorting.
 
@@ -113,49 +112,18 @@ EOT
         $bundle      = $this->getContainer()->get('kernel')->getBundle($bundle);
 
 
-        // paginator?
-        $usePaginator = $input->getOption('use-paginator') ?: false;
-        $output->writeln(array(
-            '',
-            'By default, the generator creates an index action with list of all entites.',
-            'You can also ask it to generate a paginator. Please notice that <comment>KnpPaginatorBundle</comment> is required.',
-            '',
-        ));
-        
-        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want a paginator', $usePaginator ? 'yes' : 'no', '?', $usePaginator), $usePaginator);
-
-        $usePaginator = $questionHelper->ask($input, $output, $question);        
-        $input->setOption('use-paginator', $usePaginator);
 
 
         $generator = $this->getGenerator($bundle);        
-        $generator->generate($bundle, $bundle, $entity, $metadata[0], $format, $prefix, $withWrite = true, $forceOverwrite = true, $layout = 'GestionBundle::layout.html.twig', $bodyBlock = 'body', $usePaginator, $theme = '', $withFilter = true, $withSort = true);
+        $generator->generate($bundle, $bundle, $entity, $metadata[0], $format, $prefix, $withWrite = true, $forceOverwrite = true, $layout = 'GestionBundle::layout.html.twig', $bodyBlock = 'body', $usePaginator = true, $theme = '', $withFilter = true, $withSort = true);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
         $errors = array();
         $runner = $questionHelper->getRunner($output, $errors);
 
-
-        // form
-        if ($withWrite) {
-            $output->write('Generating the Form code: ');
-            if ($this->generateForm($bundle, $entity, $metadata)) {
-                $output->writeln('<info>OK</info>');
-            } else {
-                $output->writeln('<warning>Already exists, skipping</warning>');
-            }
-        }
-
-        // form
-        if ($withFilter) {
-            $output->write('Generating the Filter code: ');
-            if ($this->generateFilter($bundle, $entity, $metadata)) {
-                $output->writeln('<info>OK</info>');
-            } else {
-                $output->writeln('<warning>Already exists, skipping</warning>');
-            }
-        }        
+        $this->generateForm($bundle, $entity, $metadata);
+        $this->generateFilter($bundle, $entity, $metadata);        
 
         // routing
         if ('annotation' != $format) {
@@ -185,7 +153,7 @@ EOT
     protected function generateFilter($bundle, $entity, $metadata)
     {
         try {
-            $this->getFilterGenerator($bundle)->generate($bundle, $bundle, $entity, $metadata[0]);
+            $this->getFilterGenerator($bundle)->generateFilter($bundle, $bundle, $entity, $metadata[0]);
         } catch (\RuntimeException $e) {
             return false;
         }

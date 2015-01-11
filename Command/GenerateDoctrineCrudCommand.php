@@ -2,6 +2,7 @@
 
 namespace Aleste\GeneratorBundle\Command;
 
+use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineCrudCommand as BaseCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,10 +19,10 @@ use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
 
 /**
  * Generates a CRUD for a Doctrine entity.
- *
- * @author Fabien Potencier <fabien@symfony.com>
+ * 
+ * @author Alejandro Steinmetz <asteinmetz78@gmail.com> 
  */
-class GenerateDoctrineCrudCommand extends GenerateDoctrineCommand
+class GenerateDoctrineCrudCommand extends BaseCommand
 {
     private $formGenerator;
 
@@ -34,10 +35,17 @@ class GenerateDoctrineCrudCommand extends GenerateDoctrineCommand
             ->setDefinition(array(
                 new InputArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)'),
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The entity class name to initialize (shortcut notation)'),
+                new InputOption('layout', '', InputOption::VALUE_REQUIRED, 'The layout to use for templates', 'GestionBundle::layout.html.twig'),
+                new InputOption('body-block', '', InputOption::VALUE_REQUIRED, 'The name of "body" block in your layout. Default is "content"', 'content'),
                 new InputOption('route-prefix', '', InputOption::VALUE_REQUIRED, 'The route prefix'),
                 new InputOption('with-write', '', InputOption::VALUE_NONE, 'Whether or not to generate create, new and delete actions'),
                 new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, yml, or annotation)', 'annotation'),
-                new InputOption('overwrite', '', InputOption::VALUE_NONE, 'Do not stop the generation if crud controller already exist, thus overwriting all generated files'),
+                new InputOption('overwrite', '', InputOption::VALUE_NONE, 'Do not stop the generation if crud controller already exist, thus overwriting all generated files'),                                    
+                new InputOption('use-paginator', '', InputOption::VALUE_NONE,'Whether or not to use paginator'),
+                //new InputOption('theme', '', InputOption::VALUE_OPTIONAL, 'A possible theme to use in forms'),
+                //new InputOption('dest', '', InputOption::VALUE_OPTIONAL, 'Change the default destination of the generated code', null),
+                new InputOption('with-filter', '', InputOption::VALUE_NONE, 'Whether or not to add filter'),
+                new InputOption('with-sort', '', InputOption::VALUE_NONE, 'Whether or not to add sorting'),
             ))
             ->setDescription('Generates a CRUD based on a Doctrine entity')
             ->setHelp(<<<EOT

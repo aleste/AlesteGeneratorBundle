@@ -23,7 +23,7 @@ use Sensio\Bundle\GeneratorBundle\Command\Validators;
  * 
  * @author Alejandro Steinmetz <asteinmetz78@gmail.com> 
  */
-class GenerateDoctrineCrudCommand extends BaseCommand
+class AlesteGeneratorCrudCommand extends BaseCommand
 {
     private $formGenerator;
     private $filterGenerator;

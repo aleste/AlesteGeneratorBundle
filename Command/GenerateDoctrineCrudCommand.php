@@ -104,6 +104,18 @@ EOT
         $withWrite = $input->getOption('with-write');
         $forceOverwrite = $input->getOption('overwrite');
 
+        $layout         = $input->getOption('layout');  // TODO validate
+        $bodyBlock      = $input->getOption('body-block');  // TODO validate
+        $usePaginator   = $input->getOption('use-paginator');
+       
+        $withFilter     = $input->getOption('with-filter');  // TODO validate
+        $withSort       = $input->getOption('with-sort');  // TODO validate
+       
+
+        if ($withFilter && !$usePaginator) {
+            throw new \RuntimeException(sprintf('Cannot use filter without paginator.'));
+        }
+
         $questionHelper->writeSection($output, 'CRUD generation');
 
         $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
@@ -111,7 +123,8 @@ EOT
         $bundle      = $this->getContainer()->get('kernel')->getBundle($bundle);
 
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
+        //$generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
+        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite, $layout, $bodyBlock, $usePaginator, $withFilter, $withSort);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
@@ -120,13 +133,24 @@ EOT
 
         // form
         if ($withWrite) {
-            $output->write('Generating the Form code: ');
+            $output->write('Generating the Filter Form code: ');
             if ($this->generateForm($bundle, $entity, $metadata)) {
                 $output->writeln('<info>OK</info>');
             } else {
                 $output->writeln('<warning>Already exists, skipping</warning>');
             }
         }
+
+                // form
+        if ($withFilter) {
+            $output->write('Generating the Form code: ');
+            if ($this->generateFilter($bundle, $entity, $metadata)) {
+                $output->writeln('<info>OK</info>');
+            } else {
+                $output->writeln('<warning>Already exists, skipping</warning>');
+            }
+        }
+
 
         // routing
         if ('annotation' != $format) {
@@ -139,12 +163,12 @@ EOT
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $questionHelper = $this->getQuestionHelper();
-        $questionHelper->writeSection($output, 'Welcome to the Doctrine2 CRUD generator');
+        $questionHelper->writeSection($output, 'Welcome to the Aleste Bootstrap 3 - Doctrine CRUD generator');
 
         // namespace
         $output->writeln(array(
             '',
-            'This command helps you generate CRUD controllers and templates.',
+            'This command helps you generate Bootstrap 3 CRUD controllers and templates with filters and paginator.',
             '',
             'First, you need to give the entity for which you want to generate a CRUD.',
             'You can give an entity that does not exist yet and the wizard will help',
@@ -176,6 +200,19 @@ EOT
 
         $withWrite = $questionHelper->ask($input, $output, $question);
         $input->setOption('with-write', $withWrite);
+
+        // filter?
+        $withFilter = $input->getOption('with-filter') ?: false;
+        $output->writeln(array(
+            '',
+            'By default, the generator creates two actions: list and show.',
+            'You can also ask it to generate "write" actions: new, update, and delete.',
+            '',
+        ));
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want to generate the "filter" actions', $withFilter ? 'yes' : 'no', '?', $withFilter), $withFilter);
+
+        $withFilter = $questionHelper->ask($input, $output, $question);
+        $input->setOption('with-filter', $withFilter);        
 
         // format
         $format = $input->getOption('format');
@@ -224,6 +261,20 @@ EOT
 
         return true;
     }
+
+    /**
+     * Tries to generate filter forms if they don't exist yet and if we need write operations on entities.
+     */
+    protected function generateFiter($bundle, $entity, $metadata)
+    {
+        try {
+            $this->getFilterGenerator($bundle)->generate($bundle, $entity, $metadata[0]);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return true;
+    }    
 
     protected function updateRouting(QuestionHelper $questionHelper, InputInterface $input, OutputInterface $output, BundleInterface $bundle, $format, $entity, $prefix)
     {
@@ -283,8 +334,50 @@ EOT
         return $this->formGenerator;
     }
 
+    protected function getFilterGenerator($bundle = null)
+    {
+        if (null === $this->filterGenerator) {
+            $this->filterGenerator = new DoctrineFormGenerator($this->getContainer()->get('filesystem'));
+            $this->filterGenerator->setSkeletonDirs($this->getSkeletonDirs($bundle));
+        }
+
+        return $this->filterGenerator;
+    }    
+
     public function setFormGenerator(DoctrineFormGenerator $formGenerator)
     {
         $this->formGenerator = $formGenerator;
     }
+
+    public function setFilterGenerator(DoctrineFormGenerator $filterGenerator)
+    {
+        $this->filterGenerator = $filterGenerator;
+    }  
+
+    /**
+     * add this bundle skeleton dirs to the beginning of the parent skeletonDirs array
+     *
+     * @param BundleInterface $bundle
+     *
+     * @return array
+     */
+    protected function getSkeletonDirs(BundleInterface $bundle = null)
+    {
+        $baseSkeletonDirs = parent::getSkeletonDirs($bundle);
+
+        $skeletonDirs = array();
+
+        if (isset($bundle) && is_dir($dir = $bundle->getPath().'/Resources/AlesteGeneratorBundle/skeleton')) {
+            $skeletonDirs[] = $dir;
+        }
+
+        if (is_dir($dir = $this->getContainer()->get('kernel')->getRootdir().'/Resources/AlesteGeneratorBundle/skeleton')) {
+            $skeletonDirs[] = $dir;
+        }
+
+        $skeletonDirs[] = __DIR__.'/../Resources/skeleton';
+        $skeletonDirs[] = __DIR__.'/../Resources';
+
+        return array_merge($skeletonDirs, $baseSkeletonDirs);
+    }      
 }

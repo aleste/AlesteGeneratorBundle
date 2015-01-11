@@ -14,12 +14,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 
 /**
  * Generates a CRUD for a Doctrine entity.

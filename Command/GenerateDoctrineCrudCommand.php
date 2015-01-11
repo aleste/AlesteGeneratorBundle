@@ -143,7 +143,7 @@ EOT
     protected function generateForm($bundle, $entity, $metadata)
     {
         try {
-            $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0]);
+            $this->getFormGenerator($bundle)->generate($bundle, $bundle, $entity, $metadata[0]);
         } catch (\RuntimeException $e) {
             return false;
         }

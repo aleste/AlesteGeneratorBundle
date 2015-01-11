@@ -74,7 +74,7 @@ EOT
     }
     }
 
-    protected function createGenerator($bundle = null)
+    private function createGenerator($bundle = null)
     {
         return new DoctrineCrudGenerator($this->getContainer()->get('filesystem'));
     }
@@ -150,7 +150,7 @@ EOT
 
         return true;
     }
-        
+
 
         protected function getFormGenerator($bundle = null)
     {

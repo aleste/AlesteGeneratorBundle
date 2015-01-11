@@ -10,7 +10,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 
 /**
  * Generates a CRUD for a Doctrine entity.
@@ -79,24 +88,17 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /*$dialog = $this->getDialogHelper();
+        
+        $questionHelper = $this->getQuestionHelper();
 
         if ($input->isInteractive()) {
-            if (!$dialog->askConfirmation($output, $dialog->getQuestion('Do you confirm generation', 'yes', '?'), true)) {
+            $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you confirm generation', 'yes', '?'), true);
+            if (!$questionHelper->ask($input, $output, $question)) {
                 $output->writeln('<error>Command aborted</error>');
 
                 return 1;
             }
-        }*/
-
-        $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('Do you confirm generation?', false);
-        if (!$helper->ask($input, $output, $question)) {
-            $output->writeln('<error>Command aborted</error>');
-            return 1;
         }
-
-        $dialog = $this->getDialogHelper();
 
         $entity = Validators::validateEntityName($input->getOption('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
@@ -117,7 +119,7 @@ EOT
             throw new \RuntimeException(sprintf('Cannot use filter without paginator.'));
         }
 
-        $dialog->writeSection($output, 'CRUD generation');
+        $questionHelper->writeSection($output, 'CRUD generation');        
 
         $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
         $metadata    = $this->getEntityMetadata($entityClass);
@@ -130,7 +132,7 @@ EOT
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
         $errors = array();
-        $runner = $dialog->getRunner($output, $errors);
+        $runner = $questionHelper->getRunner($output, $errors);
 
         // form
         if ($withWrite) {
@@ -146,10 +148,10 @@ EOT
 
         // routing
         if ('annotation' != $format) {
-            $runner($this->updateRouting($dialog, $input, $output, $bundle, $format, $entity, $prefix));
+            $runner($this->updateRouting($questionHelper, $input, $output, $bundle, $format, $entity, $prefix));
         }
 
-        $dialog->writeGeneratorSummary($output, $errors);
+        $questionHelper->writeGeneratorSummary($output, $errors);
     }
 
     protected function getFormGenerator($bundle = null)
@@ -222,8 +224,10 @@ EOT
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $dialog = $this->getDialogHelper();
-        $dialog->writeSection($output, 'Welcome to the aleste CRUD generator');
+
+        $questionHelper = $this->getQuestionHelper();
+        $questionHelper->writeSection($output, 'Welcome to the Aleste Bootstrap 3 CRUD generator');
+
 
         // namespace
         $output->writeln(array(
@@ -238,7 +242,10 @@ EOT
             '',
         ));
 
-        $entity = $dialog->askAndValidate($output, $dialog->getQuestion('The Entity shortcut name', $input->getOption('entity')), array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateEntityName'), false, $input->getOption('entity'));
+        $question = new Question($questionHelper->getQuestion('The Entity shortcut name', $input->getOption('entity')), $input->getOption('entity'));
+        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateEntityName'));
+        $entity = $questionHelper->ask($input, $output, $question);
+        
         $input->setOption('entity', $entity);
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
@@ -254,7 +261,8 @@ EOT
             '',
         ));
         // TODO add validator
-        $layout = $dialog->ask($output, $dialog->getQuestion('Layout name', $input->getOption('layout')), $input->getOption('layout'));
+        
+        $layout = $questionHelper->ask($input, $output, new Question($questionHelper->getQuestion('Routes prefix', $input->getOption('layout')), $input->getOption('layout')));
         $input->setOption('layout', $layout);
 
         // paginator?
@@ -265,18 +273,30 @@ EOT
             'You can also ask it to generate a paginator. Please notice that <comment>KnpPaginatorBundle</comment> is required.',
             '',
         ));
-        $usePaginator = $dialog->askConfirmation($output, $dialog->getQuestion('Do you want a paginator', $usePaginator ? 'yes' : 'no', '?'), $usePaginator);
+        
+
+
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want a paginator', $usePaginator ? 'yes' : 'no', '?', $usePaginator), $usePaginator);
+
+        $usePaginator = $questionHelper->ask($input, $output, $question);        
         $input->setOption('use-paginator', $usePaginator);
 
+
         // filter?
+
         $withFilter = $input->getOption('with-filter') ?: false;
         $output->writeln(array(
             '',
             'You can add a filter to generated index. Please notice that <comment>LexikFormFilterBundle </comment> is required.',
             '',
         ));
-        $withFilter = $dialog->askConfirmation($output, $dialog->getQuestion('Do you want filter', $withFilter ? 'yes' : 'no', '?'), $withFilter);
+
+
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want filter', $withFilter ? 'yes' : 'no', '?', $withFilter), $withFilter);
+
+        $withFilter = $questionHelper->ask($input, $output, $question);        
         $input->setOption('with-filter', $withFilter);
+
 
         // sort?
         $withSort = $input->getOption('with-sort') ?: false;
@@ -285,7 +305,10 @@ EOT
             'You can add sort links to columns of generated index.',
             '',
         ));
-        $withSort = $dialog->askConfirmation($output, $dialog->getQuestion('Do you want sort', $withSort ? 'yes' : 'no', '?'), $withSort);
+
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want sort', $withSort ? 'yes' : 'no', '?', $withSort), $withSort);
+
+        $withSort = $questionHelper->ask($input, $output, $question);                
         $input->setOption('with-sort', $withSort);
 
         // write?
@@ -296,9 +319,14 @@ EOT
             'You can also ask it to generate "write" actions: new, update, and delete.',
             '',
         ));
-        $withWrite = $dialog->askConfirmation($output, $dialog->getQuestion('Do you want to generate the "write" actions', $withWrite ? 'yes' : 'no', '?'), $withWrite);
+
+        $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want to generate the "write" actions', $withWrite ? 'yes' : 'no', '?', $withWrite), $withWrite);
+
+        $withWrite = $questionHelper->ask($input, $output, $question);                
         $input->setOption('with-write', $withWrite);
 
+
+        
         // format
         $format = $input->getOption('format');
         $output->writeln(array(
@@ -306,9 +334,11 @@ EOT
             'Determine the format to use for the generated CRUD.',
             '',
         ));
-        $format = $dialog->askAndValidate($output, $dialog->getQuestion('Configuration format (yml, xml, php, or annotation)', $format), array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'), false, $format);
-        $input->setOption('format', $format);
 
+        $question = new Question($questionHelper->getQuestion('Configuration format (yml, xml, php, or annotation)', $input->getOption('format')), $input->getOption('format'));
+        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
+        $format = $questionHelper->ask($input, $output, $question);        
+                
         // route prefix
         $prefix = $this->getRoutePrefix($input, $entity);
         $output->writeln(array(
@@ -317,19 +347,19 @@ EOT
             'prefix: /prefix/, /prefix/new, ...).',
             '',
         ));
-        $prefix = $dialog->ask($output, $dialog->getQuestion('Routes prefix', '/'.$prefix), '/'.$prefix);
+        $prefix = $questionHelper->ask($input, $output, new Question($questionHelper->getQuestion('Routes prefix', '/'.$prefix), '/'.$prefix));
         $input->setOption('route-prefix', $prefix);
-
-
 
         // summary
         $output->writeln(array(
             '',
             $this->getHelper('formatter')->formatBlock('Summary before generation', 'bg=blue;fg=white', true),
             '',
-            sprintf("You are going to generate a CRUD controller for \"<info>%s:%s</info>\"", $bundle, $entity),
+            sprintf("You are going to generate a Bootstrap 3 CRUD controller for \"<info>%s:%s</info>\"", $bundle, $entity),
             sprintf("using the \"<info>%s</info>\" format.", $format),
             '',
         ));
+
+
     }
 }

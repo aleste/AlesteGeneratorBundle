@@ -212,7 +212,7 @@ EOT
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $questionHelper = $this->getQuestionHelper();
-        $questionHelper->writeSection($output, 'Welcome to the Aleste Bootstrap 3 CRUD generator whit paginator and filters.');
+        $questionHelper->writeSection($output, 'Welcome to the Aleste AdminLTE bootstrap theme CRUD generator');
 
         parent::interact($input, $output);       
 
